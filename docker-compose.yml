@@ -1,0 +1,9 @@
+version: '3.3'
+services:
+    synctube:
+        ports:
+            - '2400:8000'
+        container_name: synctube
+        volumes:
+            - '${PWD}/user:/usr/src/app/user'
+        image: synctube:bd072e0

@@ -1,9 +1,9 @@
 {
-	"port": 4200,
+	"port": 8000,
 	"channelName": "SyncTube",
 	"maxLoginLength": 20,
 	"maxMessageLength": 500,
-	"serverChatHistory": 50,
+	"serverChatHistory": 1,
 	"totalVideoLimit": 0,
 	"userVideoLimit": 0,
 	"requestLeaderOnPause": false,
