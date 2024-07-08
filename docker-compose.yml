@@ -6,4 +6,4 @@ services:
         container_name: synctube
         volumes:
             - '${PWD}/user:/usr/src/app/user'
-        image: synctube:bd072e0
+        image: synctube:20240608
