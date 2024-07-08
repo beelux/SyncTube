@@ -531,8 +531,7 @@ class Main {
 					if (userList.admins.exists(
 						a -> a.name.toLowerCase() == lcName && a.hash == hash)) {
 						client.isAdmin = true;
-					}
-					else {
+					} else {
 						serverMessage(client, "passwordMatchError");
 						send(client, {type: LoginError});
 						return;
@@ -587,6 +586,17 @@ class Main {
 				broadcast(data);
 
 			case ServerMessage:
+			case GetYoutubeVideoInfo:
+				final url = data.getYoutubeVideoInfo.url;
+				YoutubeFallback.getInfo(url, info -> {
+					send(client, {
+						type: data.type,
+						getYoutubeVideoInfo: {
+							url: url,
+							response: info
+						}
+					});
+				});
 			case AddVideo:
 				if (isPlaylistLockedFor(client)) return;
 				if (!checkPermission(client, AddVideoPerm)) return;
@@ -602,16 +612,18 @@ class Main {
 				if (!data.addVideo.atEnd && !checkPermission(client, ChangeOrderPerm)) {
 					data.addVideo.atEnd = true;
 				}
-				final item = data.addVideo.item;
+				var item = data.addVideo.item;
 				item.author = client.name;
-				final local = '$localIp:$port';
-				if (item.url.contains(local)) {
-					item.url = item.url.replace(local, '$globalIp:$port');
+				final localIpPort = '$localIp:$port';
+				if (item.url.contains(localIpPort)) {
+					final newUrl = item.url.replace(localIpPort, '$globalIp:$port');
+					item = item.withUrl(newUrl);
 				}
 				if (videoList.exists(i -> i.url == item.url)) {
 					serverMessage(client, "videoAlreadyExistsError");
 					return;
 				}
+				data.addVideo.item = item;
 				videoList.addItem(item, data.addVideo.atEnd);
 				broadcast(data);
 				// Initial timer start if VideoLoaded is not happen
@@ -1038,7 +1050,9 @@ class Main {
 			duration: duration,
 			time: time
 		});
-		while (flashbacks.length > FLASHBACKS_COUNT) flashbacks.pop();
+		while (flashbacks.length > FLASHBACKS_COUNT) {
+			flashbacks.pop();
+		}
 	}
 
 	function isPlaylistLockedFor(client:Client):Bool {
